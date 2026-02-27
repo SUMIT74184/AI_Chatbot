@@ -21,7 +21,7 @@ async def send_message(session_id:str,user_id:str,message:str):
     }
     
     await session_collection.update_one(
-        {"id":ObjectId(session_id)},
+        {"_id":ObjectId(session_id)},
         {"$push":{"messages":user_msg}}
     )
     
@@ -29,14 +29,14 @@ async def send_message(session_id:str,user_id:str,message:str):
         {"_id":ObjectId(session_id)}
     )
     
-    last_message = updated["messages"][-15:]
+    last_messages = updated.get("messages", [])[-15:]
     
     gemini_format = []
-    for msg in last_message:
+    for msg in last_messages:
         role = "user" if msg["role"] == "user" else "model"
         gemini_format.append({
-            "role":role,
-            "parts":[{"text": msg["context"]}]
+            "role": role,
+            "parts": [{"text": msg.get("content", "")}] 
         })
         
     ai_reply= await generate_response(gemini_format)

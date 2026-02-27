@@ -36,6 +36,30 @@ async def login(email:str, password:str):
     return {"access_token":token, "token_type":"bearer"}
 
 
+# Creating the Session
+
+@router.post("/sessions")
+async def create_session(
+    request: CreateSessionRequest,
+    user_id:str = Depends(get_current_user)
+):
+    session = {
+        "user_id": user_id,
+        "title": request.title,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+        "messages":[]
+    }
+    
+    result= await session_repo.create_session(session)
+    
+    return {
+        "id":str(result.inserted_id),
+        "title":request.title
+    }
+
+    # first message 
+
 @router.post("/chat/{session_id}", response_model=ChatResponse)
 async def chat(
     session_id: str,
@@ -59,29 +83,6 @@ async def chat(
         "assistant_response": reply
     }
 
-
-
-# Creating the Session
-
-@router.post("/sessions")
-async def create_session(
-    request: CreateSessionRequest,
-    user_id:str = Depends(get_current_user)
-):
-    session = {
-        "user_id": user_id,
-        "title": request.title,
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow(),
-        "messages":[]
-    }
-    
-    result= await session_repo.create_session(session)
-    
-    return {
-        "id":str(result.inserted_id),
-        "title":request.title
-    }
     
 # Get All the sessions
 

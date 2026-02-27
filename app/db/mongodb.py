@@ -1,11 +1,9 @@
-
 from motor.motor_asyncio import AsyncIOMotorClient
-from app.core.config import Settings
+from app.core.config import settings
 
-client = AsyncIOMotorClient(Settings.MONGO_URI)
-db = client[Settings.DB_NAME]
+
+client = AsyncIOMotorClient(settings.MONGO_URI)
+db = client[settings.DB_NAME] 
 
 users_collection = db["users"]
 session_collection = db["sessions"]
-
-

@@ -1,20 +1,4 @@
 services:
-  # The Python Chatbot App
-  api:
-    build: .
-    container_name: grovyn_api
-    restart: always
-    env_file:
-      - .env
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    depends_on:
-      - mongodb
-     
-
-  # NoSQL Database (MongoDB)
   mongodb:
     image: mongo:6.0
     container_name: grovyn_mongodb
@@ -27,6 +11,19 @@ services:
     volumes:
       - mongo_data:/data/db
 
+  #  NEW FASTAPI SERVICE
+  api:
+    build: . 
+    container_name: grovyn_api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    env_file:
+      - .env  
+    environment:
+     
+      - MONGO_URI=mongodb://admin:secretpassword@mongodb:27017/?authSource=admin
 
 volumes:
   mongo_data:
