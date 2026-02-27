@@ -1,0 +1,32 @@
+services:
+  # The Python Chatbot App
+  api:
+    build: .
+    container_name: grovyn_api
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - mongodb
+     
+
+  # NoSQL Database (MongoDB)
+  mongodb:
+    image: mongo:6.0
+    container_name: grovyn_mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secretpassword
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+
+volumes:
+  mongo_data:
