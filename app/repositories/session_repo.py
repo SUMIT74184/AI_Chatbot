@@ -24,3 +24,6 @@ async def delete_session(session_id: str, user_id: str):
         "_id": ObjectId(session_id),
         "user_id": user_id
     })
+
+async def delete_user_sessions(user_id: str):
+    return await session_collection.delete_many({"user_id": user_id})

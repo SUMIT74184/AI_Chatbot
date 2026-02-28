@@ -9,3 +9,6 @@ async def create_user(user_data: dict):
 
 async def get_user_by_id(user_id: str):
     return await users_collection.find_one({"_id": ObjectId(user_id)})
+
+async def delete_user(user_id: str):
+    return await users_collection.delete_one({"_id": ObjectId(user_id)})

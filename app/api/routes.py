@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer,HTTPAuthorizationCredentials
 from app.schemas.chat import ChatResponse, MessageRequest
+from app.services import auth_Service, chat_services
 from app.services.auth_Service import register_user, authenticate_user
 from app.services.chat_services import send_message
 from app.core.security import verify_token
@@ -119,7 +120,7 @@ async def get_session(
 
 
 # Delete Session by Id
-
+@router.delete("/sessions/{session_id}")
 async def delete_session(
     session_id:str,
     user_id:str = Depends(get_current_user)
@@ -130,6 +131,14 @@ async def delete_session(
         raise HTTPException(status_code=404, detail="Session not found")
     
     return {"message":"session deleted successfully"}
+
+# Delete User by Id
+@router.delete("/users")
+async def delete_user_route(user_id: str = Depends(get_current_user)):
+    if not await auth_Service.delete_user(user_id):
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User deleted successfully"}
 
 
 
