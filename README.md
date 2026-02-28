@@ -80,7 +80,7 @@ cp .env.example .env
 
 Edit `.env`:
 ```env
-DATABASE_URL=mongodb://admin:secretpassword@mongodb:27017/chatbot_db?authSource=admin
+MONGO_URI=mongodb://admin:secretpassword@mongodb:27017/chatbot_db?authSource=admin
 DB_NAME=chatbot_db
 JWT_SECRET=your_secure_random_secret
 JWT_ALGORITHM=HS256
