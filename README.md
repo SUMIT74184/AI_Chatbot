@@ -1,62 +1,171 @@
 # GrovynAI Chatbot
 
-This is a FastAPI-powered AI chatbot application.
+Production-ready AI-powered chatbot backend built with FastAPI, MongoDB, and Google Gemini API.
+
+## Features
+
+- **JWT-based Authentication** - Secure token-based auth with 30-minute expiration
+- **Multi-user Support** - Isolated user sessions and conversations
+- **Conversation Management** - Persistent session storage with MongoDB
+- **Context-aware AI** - Smart context handling with Gemini LLM
+- **Rate Limiting** - Request throttling for API protection
+- **Error Handling** - Comprehensive error responses
+- **Dockerized** - Container-ready deployment
+- **Async Architecture** - Non-blocking I/O for high performance
+
+## Architecture
+```
+Client → API Layer → Service Layer → Repository Layer → MongoDB
+                          ↓
+                     Gemini API
+```
+
+### Layers
+
+- **API Layer**: Request validation, authentication, routing
+- **Service Layer**: Business logic, context management, AI prompts
+- **Repository Layer**: Database abstraction
+- **Security Layer**: JWT tokens & password hashing
+- **AI Integration**: Gemini API with timeout & fallback
+
+## Database Schema
+
+### Users
+```json
+{
+  "_id": "ObjectId",
+  "email": "string",
+  "password_hash": "string",
+  "created_at": "datetime"
+}
+```
+
+### Sessions
+```json
+{
+  "_id": "ObjectId",
+  "user_id": "string",
+  "title": "string",
+  "created_at": "datetime",
+  "updated_at": "datetime",
+  "messages": [
+    {
+      "role": "user | assistant",
+      "content": "string",
+      "timestamp": "datetime"
+    }
+  ]
+}
+```
 
 ## Prerequisites
 
 - Python 3.10+
-- Docker (for running with Docker)
+- Docker (optional)
 - MongoDB
+- [Gemini API Key](https://aistudio.google.com/app/)
 
-## Getting Started
+## Setup
 
-1. **Clone the repository:**
+### 1. Clone Repository
+```bash
+git clone https://github.com/your-username/GrovynAI-Chatbot.git
+cd GrovynAI-Chatbot
+```
 
-   ```bash
-   git clone https://github.com/your-username/GrovynAI-Chatbot.git
-   cd GrovynAI-Chatbot
-   ```
+### 2. Environment Configuration
+```bash
+cp .env.example .env
+```
 
-2. **Create a virtual environment and install dependencies:**
+Edit `.env`:
+```env
+DATABASE_URL=mongodb://admin:secretpassword@mongodb:27017/chatbot_db?authSource=admin
+DB_NAME=chatbot_db
+JWT_SECRET=your_secure_random_secret
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+GEMINI_API_KEY=your_gemini_key
+```
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-   pip install -r requirements.txt
-   ```
+### 3. Run Application
 
-3. **Set up environment variables:**
+#### Local Development
+```bash
+uvicorn app.main:app --reload
+```
 
-   Create a `.env` file by copying the `.env.example` file:
+#### Docker
+```bash
+docker-compose up --build
+```
 
-   ```bash
-   cp .env.example .env
-   ```
+Access API documentation: `http://localhost:8000/docs`
 
-   Update the `.env` file with your MongoDB connection string and other settings.
+## API Endpoints
 
-## Running the Application
+### Authentication
+- `POST /auth/register` - Create new user
+- `POST /auth/login` - Get JWT token
 
-### Locally
+### Sessions
+- `POST /sessions` - Create chat session
+- `GET /sessions` - List user sessions
+- `GET /sessions/{session_id}` - Get session details
+- `DELETE /sessions/{session_id}` - Delete session
 
-1. **Start the FastAPI application:**
+### Chat
+- `POST /chat/{session_id}` - Send message
 
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+### User
+- `DELETE /users/me` - Delete account
 
-   The application will be running at `http://127.0.0.1:8000`.
+## Testing
 
-### With Docker
+1. Navigate to `http://localhost:8000/docs`
+2. Register a new user
+3. Login to get JWT token
+4. Click **Authorize** button and enter `Bearer <your_token>`
+5. Create a session
+6. Send chat messages
 
-1. **Build and run the Docker containers:**
+## Scalability
 
-   ```bash
-   docker-compose up -d --build
-   ```
+- **Async FastAPI** - Non-blocking I/O
+- **Stateless Auth** - Horizontal scaling ready
+- **Connection Pooling** - Efficient database connections
+- **Containerized** - Kubernetes/ECS ready
 
-   This will start the FastAPI application and a MongoDB container. The application will be accessible at `http://localhost:8000`.
+## Security
 
-## API Documentation
+- Environment variables via `.gitignore`
+- JWT secret management
+- bcrypt password hashing
+- Pydantic input validation
+- Rate limiting
 
-Once the application is running, you can access the API documentation at `http://localhost:8000/docs`.
+## Edge Cases Handled
+
+- Invalid/expired JWT tokens
+- Unauthorized session access
+- Empty or oversized messages
+- Invalid session IDs
+- Gemini API timeouts
+- API failures with fallbacks
+- Rate limit exceeded
+- Database connectivity issues
+- Context overflow prevention
+
+
+
+## License
+
+For technical evaluation purposes.
+
+## Contributing
+
+Contributions welcome! Please open an issue first to discuss changes.
+
+---
+
+**Note**: Gemini API keys have daily limits. Generate new keys at [Google AI Studio](https://aistudio.google.com/app/).
